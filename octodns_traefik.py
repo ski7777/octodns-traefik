@@ -23,7 +23,6 @@ class TraefikSource(BaseSource):
         if len(self.zones) > 0:
             self.log.warning("Zone-based config is currently not supported. Ignoring...")
         self.client = TraefikClient(traefik_api_url)
-        self.routers = asyncio.run(self.client.list_routers())
         routers = asyncio.run(self._get_routers())
         self.hosts = self._get_hosts(routers)
         self.log.info(self.hosts)
