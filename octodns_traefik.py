@@ -1,7 +1,7 @@
 import asyncio
 import itertools
 from logging import getLogger
-from octodns.zone.base import SubzoneRecordException
+from octodns.zone.base import DuplicateRecordException, SubzoneRecordException
 from traefik import Router, TraefikClient
 from typing import Dict, Optional, List
 
@@ -80,6 +80,11 @@ class TraefikSource(BaseSource):
                         zone.add_record(record, lenient=lenient)
                     except SubzoneRecordException:
                         pass
+                    except DuplicateRecordException:
+                        self.log.info(
+                            'populate:   duplicate record %s, skipping',
+                            record,
+                        )
 
         self.log.info(
             'populate:   found %s records, exists=False',
