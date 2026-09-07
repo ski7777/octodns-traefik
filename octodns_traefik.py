@@ -15,7 +15,7 @@ class TraefikSource(BaseSource):
     def __init__(self, id, traefik_api_url:str, default_record_set:Optional[list] = None, zones: Optional[dict] = None, default_ttl: int = 3600):
         klass = self.__class__.__name__
         self.log = getLogger(f'{klass}[{id}]')
-        self.log.debug('__init__: id=%s, name=%s, ttl=%d', id, ttl)
+        self.log.debug('__init__: id=%s', id)
         super().__init__(id)
         self.traefik_api_url = traefik_api_url
         self.default_record_set = default_record_set | []
