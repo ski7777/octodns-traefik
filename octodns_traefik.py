@@ -40,8 +40,8 @@ class TraefikSource(BaseSource):
 
     @staticmethod
     def _is_subdomain(hostname: str, domain: str) -> bool:
-        hostname = hostname.rstrip(".").lower()
-        domain = domain.rstrip(".").lower()
+        hostname = hostname.removesuffix(".").lower()
+        domain = domain.removesuffix(".").lower()
         if not hostname or not domain:
             return False
         return hostname.endswith("." + domain)
@@ -49,8 +49,8 @@ class TraefikSource(BaseSource):
     @staticmethod
     def _get_subdomain(hostname: str, domain: str) -> str:
         hostname = hostname.rstrip(".").lower()
-        domain = domain.rstrip(".").lower()
-        return hostname.rstrip("." + domain)
+        domain = domain.removesuffix(".").lower()
+        return hostname.removesuffix("." + domain)
 
     def populate(self, zone, target=False, lenient=False):
         # This is the method adding records to the zone. For a source it's the
