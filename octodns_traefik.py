@@ -1,6 +1,7 @@
 import asyncio
 import itertools
 from logging import getLogger
+from octodns.zone.base import SubzoneRecordException
 from traefik import Router, TraefikClient
 from typing import Dict, Optional, List
 
@@ -33,8 +34,23 @@ class TraefikSource(BaseSource):
             routers = await client.list_routers()
         return routers
 
-    def _get_hosts(self, routers: list[Router]) -> set[str]:
+    @staticmethod
+    def _get_hosts(routers: list[Router]) -> set[str]:
         return set(list(itertools.chain(*[r.hostnames for r in routers])))
+
+    @staticmethod
+    def _is_subdomain(hostname: str, domain: str) -> bool:
+        hostname = hostname.rstrip(".").lower()
+        domain = domain.rstrip(".").lower()
+        if not hostname or not domain:
+            return False
+        return hostname.endswith("." + domain)
+
+    @staticmethod
+    def _get_subdomain(hostname: str, domain: str) -> str:
+        hostname = hostname.rstrip(".").lower()
+        domain = domain.rstrip(".").lower()
+        return hostname.rstrip("." + domain)
 
     def populate(self, zone, target=False, lenient=False):
         # This is the method adding records to the zone. For a source it's the
@@ -49,6 +65,20 @@ class TraefikSource(BaseSource):
         )
 
         before = len(zone.records)
+
+        for hostname in self.hosts:
+            if self._is_subdomain(hostname, zone.name):
+                for rd in self.default_record_set:
+                    record = Record.new(
+                        zone, 
+                        self._get_subdomain(hostname, zone.name),
+                        rd,
+                        source=self
+                    )
+                    try:
+                        zone.add_record(record, lenient=lenient)
+                    except SubzoneRecordException:
+                        pass
 
         self.log.info(
             'populate:   found %s records, exists=False',
