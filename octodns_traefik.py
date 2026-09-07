@@ -75,6 +75,7 @@ class TraefikSource(BaseSource):
                         rd,
                         source=self
                     )
+                    self.log.info('name=%s, zone=%s', self._get_subdomain(hostname, zone.name), zone.name)
                     try:
                         zone.add_record(record, lenient=lenient)
                     except SubzoneRecordException:
