@@ -30,8 +30,8 @@ class TraefikSource(BaseSource):
 
     async def _get_routers(self) -> list[Router]:
         routers: list[Router]
-        async with self.client:
-            routers = await self.client.list_routers()
+        async with self.client as client:
+            routers = await client.list_routers()
         return routers
 
     def _get_hosts(self, routers: list[Router]) -> set[str]:
