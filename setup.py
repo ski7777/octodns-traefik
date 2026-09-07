@@ -13,6 +13,6 @@ setuptools.setup(
     py_modules=["octodns_traefik"],
     install_requires=[
         'octodns>=0.9.21',
-        'traefik>=1.10.0'
+        'traefik>=1.1.0'
     ]
 )
