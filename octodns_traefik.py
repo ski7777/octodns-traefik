@@ -18,8 +18,8 @@ class TraefikSource(BaseSource):
         self.log.debug('__init__: id=%s', id)
         super().__init__(id)
         self.traefik_api_url = traefik_api_url
-        self.default_record_set = default_record_set | []
-        self.zones = zones | {}
+        self.default_record_set = default_record_set or []
+        self.zones = zones or {}
         if len(self.zones) > 0:
             self.log.warning("Zone-based config is currently not supported. Ignoring...")
         self.client = TraefikClient(traefik_api_url)
