@@ -26,7 +26,6 @@ class TraefikSource(BaseSource):
         self.client = TraefikClient(traefik_api_url)
         routers = asyncio.run(self._get_routers())
         self.hosts = self._get_hosts(routers)
-        self.log.info(self.hosts)
 
     async def _get_routers(self) -> list[Router]:
         routers: list[Router]
@@ -75,8 +74,6 @@ class TraefikSource(BaseSource):
                         rd,
                         source=self
                     )
-                    self.log.info('hostname=%s, zone=%s', hostname, zone.name)
-                    self.log.info('shortname=%s, zone=%s', self._get_subdomain(hostname, zone.name), zone.name)
                     try:
                         zone.add_record(record, lenient=lenient)
                     except SubzoneRecordException:
