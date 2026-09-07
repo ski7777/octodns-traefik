@@ -1,7 +1,7 @@
 import asyncio
 import itertools
 from logging import getLogger
-from traefik import TraefikClient
+from traefik import Router, TraefikClient
 from typing import Dict, Optional, List
 
 from octodns.record import Record
@@ -24,9 +24,18 @@ class TraefikSource(BaseSource):
             self.log.warning("Zone-based config is currently not supported. Ignoring...")
         self.client = TraefikClient(traefik_api_url)
         self.routers = asyncio.run(self.client.list_routers())
+        routers = asyncio.run(self._get_routers)
+        self.hosts = self._get_hosts(routers)
+        self.log.info(self.hosts)
 
-        self.hosts = set(list(itertools.chain(*[r.hostnames for r in self.routers])))
-        self.log.debug(self.hosts)
+    async def _get_routers(self) -> list[Router]:
+        routers: list[Router]
+        async with self.client:
+            routers = await self.client.list_routers()
+        return routers
+
+    def _get_hosts(self, routers: list[Router]) -> set[str]:
+        return set(list(itertools.chain(*[r.hostnames for r in routers])))
 
     def populate(self, zone, target=False, lenient=False):
         # This is the method adding records to the zone. For a source it's the
